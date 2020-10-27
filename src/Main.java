@@ -1,0 +1,123 @@
+package com.company;
+
+
+import java.util.Random;
+import  java.util.Scanner;
+
+class Main {
+    //В качестве полей используются три символьные константы
+    //Модификатор final говорит о том, что значения этих переменных нельзя изменить
+    final char SIGN_X = 'x';
+    final char SIGN_O = 'o';
+    final char SIGN_EMPTY = '.';
+    //Двумерный символьный массив table. Является игровым полем
+    char[][] table;
+    //Объект random необходим для генерации ходов компьютера
+    Random random;
+    // объект scanner необходи для ввода данных пользователя
+    Scanner scanner;
+
+    public static void main (String[] args) {
+        new Main().game();
+    }
+
+    Main() {
+        //конструктор инициализации полей
+        random = new Random();
+        scanner = new Scanner(System.in);
+        table = new char[3][3];
+    }
+
+    void game() {
+        //игровая логика
+        initTable();
+        while (true) {
+            turnHuman();
+            if (checkWin(SIGN_X)) {
+                System.out.println("Вы выйграли!");
+                break;
+            }
+            if (isTableFull()) {
+                System.out.println("Ничья!");
+                break;
+            }
+            turnAI();
+            printTable();
+            if (checkWin(SIGN_O)) {
+                System.out.println("Компьютер выйграл");
+                break;
+            }
+            if (isTableFull()) {
+                System.out.println("Ничья!");
+                break;
+            }
+        }
+        System.out.println("Game Over");
+        printTable();
+    }
+
+    void initTable() {
+        //Создание пустой таблицы 3х3
+        for (int row = 0; row < 3; row++)
+            for (int col = 0; col < 3; col++)
+                table[row][col] = SIGN_EMPTY;
+    }
+
+    void printTable() {
+        //Вывод на экран текущего состояния таблицы
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++)
+                System.out.print(table[row][col] + " ");
+            System.out.println();
+        }
+    }
+
+    void turnHuman() {
+        //Позволяет пользователю сделать ход
+        int x, y;
+        do {
+            System.out.println("Введите координаты X Y (от 1 до 3):");
+            x = scanner.nextInt() - 1;
+            y = scanner.nextInt() - 1;
+            //Метод isCellValid возвращает true если ячейка свободна и существует. false если ячейка занята или не существует
+        } while (!isCellValid(x, y));
+        table[y][x] = SIGN_X;
+    }
+
+    boolean isCellValid(int x, int y) {
+        if (x < 0 || y < 0 || x >= 3 || y >= 3)
+            return false;
+        return table[y][x] == SIGN_EMPTY;
+    }
+
+    void turnAI() {
+        int x, y;
+        do {
+            x = random.nextInt(3);
+            y = random.nextInt(3);
+        } while (!isCellValid(x, y));
+        table[y][x] = SIGN_O;
+    }
+
+    boolean checkWin(char dot) {
+        for (int i = 0; i < 3; i++)
+            if ((table[i][0] == dot && table[i][1] == dot && table[i][2] == dot) ||
+                    (table[0][i] == dot && table[1][i] == dot && table[2][i] == dot))
+                return true;
+
+        if ((table[0][0] == dot && table[1][1] == dot && table[2][2] == dot) ||
+                (table[0][2] == dot && table[1][1] == dot && table[2][0] == dot))
+            return true;
+        return false;
+    }
+
+
+    boolean isTableFull() {
+        for (int row = 0; row < 3; row++)
+            for (int col = 0; col < 3; col++)
+                if (table[row][col] == SIGN_EMPTY)
+                    return false;
+        return true;
+    }
+
+}
